@@ -1,0 +1,62 @@
+// Requires
+
+var express = require('express');
+var mongoose = require('mongoose');
+var bodyParser = require('body-parser');
+
+//Init variables
+
+var app = express();
+
+//Rutas
+
+// Body Parser
+// parse application/x-www-form-urlencoded
+app.use(bodyParser.urlencoded({ extended: false }))
+app.use(bodyParser.json())
+
+// Conexión a la base de datos
+mongoose.connection.openUri('mongodb://localhost:27017/sistemaAdminDB', (err, res) => {
+
+    if (err) throw err;
+
+    console.log('Base de datos: \x1b[32m%s\x1b[0m', 'online');
+
+});
+// Escuchar peticiones
+
+// Importar rutas
+var appRoutes = require('./routes/app');
+var usuarioRoutes = require('./routes/usuario');
+
+ var categoriaRoutes = require('./routes/categoria');
+ var loginRoutes = require('./routes/login');
+ var productoRoutes = require('./routes/producto');
+ var clienteRoutes = require('./routes/cliente');
+ 
+// var busquedaRoutes = require('./routes/busqueda');
+// var uploadRoutes = require('./routes/upload');
+// var imagenesRoutes = require('./routes/imagenes');
+
+
+// Rutas
+
+
+app.use('/usuario', usuarioRoutes);
+app.use('/categoria', categoriaRoutes);
+
+app.use('/login', loginRoutes);
+app.use('/producto', productoRoutes);
+app.use('/cliente', clienteRoutes);
+
+
+// app.use('/busqueda', busquedaRoutes);
+// app.use('/upload', uploadRoutes);
+// app.use('/img', imagenesRoutes);
+
+
+app.use('/', appRoutes);
+
+app.listen(3001, ()=>{
+    console.log('Express server puerto 3001: \x1b[32m%s\x1b[0m', 'online');
+})
