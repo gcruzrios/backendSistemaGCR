@@ -1,5 +1,6 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
+var uniqueValidator = require('mongoose-unique-validator');
 
 var tiposValidos = {
     values: ['PRODUCTO', 'SERVICIO'],
@@ -7,6 +8,7 @@ var tiposValidos = {
 };
 
 var productoSchema = new Schema({
+    codigo: { type: String, unique: true, required: [true, 'El código de Producto es necesario'] },
     nombre: { type: String, required: [true, 'El nombre de Producto es necesario'] },
     img: { type: String, required: false },
     categoria: { 
@@ -18,6 +20,6 @@ var productoSchema = new Schema({
     tipo: { type: String, required: true, default: 'PRODUCTO', enum: tiposValidos },
 }, { collection: 'productos' });
 
-
+productoSchema.plugin(uniqueValidator, { message: '{PATH} debe de ser único' });
 
 module.exports = mongoose.model('Producto', productoSchema);

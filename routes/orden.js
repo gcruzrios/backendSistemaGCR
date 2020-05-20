@@ -4,36 +4,36 @@ var mdAutenticacion = require('../middlewares/autenticacion');
 
 var app = express();
 
-var Producto = require('../models/producto');
+var Orden = require('../models/orden');
 
 // ==========================================
-// Obtener todos los producto
+// Obtener todos las ordenes
 // ==========================================
 app.get('/', (req, res, next) => {
 
     var desde = req.query.desde || 0;
     desde = Number(desde);
 
-    Producto.find({})
+    Orden.find({})
         .skip(desde)
         .limit(20)
-        //.populate('usuario', 'nombre email')
-        .populate('categoria')
+        .populate('usuario', 'nombre email')
+        .populate('cliente')
         .exec(
-            (err, productos) => {
+            (err, ordenes) => {
 
                 if (err) {
                     return res.status(500).json({
                         ok: false,
-                        mensaje: 'Error cargando producto',
+                        mensaje: 'Error cargando ordenes',
                         errors: err
                     });
                 }
 
-                Producto.count({}, (err, conteo) => {
+                Orden.count({}, (err, conteo) => {
                     res.status(200).json({
                         ok: true,
-                        productos: productos,
+                        ordenes: ordenes,
                         total: conteo
                     });
 
@@ -42,35 +42,35 @@ app.get('/', (req, res, next) => {
             });
 });
 
-// Obtener 1 producto
+// Obtener 1 orden
 app.get('/:id', (req, res) => {
 
     var id = req.params.id;
 
-    Producto.findById(id) 
-        //.populate('usuario', 'nombre email img')
-        .populate('categoria')
-        .exec ((err, producto)=>{
+    Orden.findById(id) 
+        .populate('usuario', 'nombre email img')
+        .populate('cliente')
+        .exec ((err, orden)=>{
             if (err) {
                 return res.status(500).json({
                     ok: false,
-                    mensaje: 'Error al buscar producto',
+                    mensaje: 'Error al buscar una orden',
                     errors: err
                 });
             }
 
-            if (!producto) {
+            if (!orden) {
                 return res.status(400).json({
                     ok: false,
-                    mensaje: 'El producto con el id ' + id + ' no existe',
-                    errors: { message: 'No existe un producto con ese ID' }
+                    mensaje: 'La orden con el id ' + id + ' no existe',
+                    errors: { message: 'No existe una orden con ese ID' }
                 });
             }
     
             
              res.status(200).json({
              ok: false,
-             producto: producto
+             orden: orden
                     
              });
           
@@ -80,52 +80,53 @@ app.get('/:id', (req, res) => {
 });
 
 // ==========================================
-// Actualizar Producto
+// Actualizar Orden
 // ==========================================
 app.put('/:id', mdAutenticacion.verificaToken, (req, res) => {
 
     var id = req.params.id;
     var body = req.body;
 
-    Producto.findById(id, (err, producto) => {
+    Orden.findById(id, (err, orden) => {
 
 
         if (err) {
             return res.status(500).json({
                 ok: false,
-                mensaje: 'Error al buscar producto',
+                mensaje: 'Error al buscar orden',
                 errors: err
             });
         }
 
-        if (!producto) {
+        if (!orden) {
             return res.status(400).json({
                 ok: false,
-                mensaje: 'El producto con el id ' + id + ' no existe',
-                errors: { message: 'No existe un producto con ese ID' }
+                mensaje: 'La orden con el id ' + id + ' no existe',
+                errors: { message: 'No existe una orden con ese ID' }
             });
         }
 
-        producto.codigo = body.codigo;
-        producto.nombre = body.nombre;
-        //producto.usuario = req.usuario._id;
-        producto.categoria = body.categoria;
-        producto.precio = body.precio;
-        
 
-        producto.save((err, productoGuardado) => {
+        orden.num_orden = body.num_orden;
+        orden.consecutivo = body.consecutivo;
+        orden.usuario = req.usuario._id;
+        orden.cliente = body.cliente;
+        orden.total = body.total;
+        orden.tipo = body.tipo;
+
+        orden.save((err, ordenGuardado) => {
 
             if (err) {
                 return res.status(400).json({
                     ok: false,
-                    mensaje: 'Error al actualizar producto',
+                    mensaje: 'Error al actualizar orden',
                     errors: err
                 });
             }
 
             res.status(200).json({
                 ok: true,
-                producto: productoGuardado
+                orden: ordenGuardado
             });
 
         });
@@ -137,33 +138,36 @@ app.put('/:id', mdAutenticacion.verificaToken, (req, res) => {
 
 
 // ==========================================
-// Crear un nuevo producto
+// Crear un nueva orden
 // ==========================================
 app.post('/', mdAutenticacion.verificaToken, (req, res) => {
 
     var body = req.body;
 
-    var producto = new Producto({
-        codigo: body.codigo,
-        nombre: body.nombre,
-        //usuario: req.usuario._id,
-        categoria: body.categoria,
-        precio: body.precio
+    var orden = new Orden({
+
+        num_orden : body.num_orden,
+        consecutivo : body.consecutivo,
+        usuario : req.usuario._id,
+        cliente : body.cliente,
+        // nombre: body.nombre,
+        // usuario: req.usuario._id,
+        // hospital: body.hospital
     });
 
-    producto.save((err, productoGuardado) => {
+    orden.save((err, ordenGuardado) => {
 
         if (err) {
             return res.status(400).json({
                 ok: false,
-                mensaje: 'Error al crear producto',
+                mensaje: 'Error al crear la orden',
                 errors: err
             });
         }
 
         res.status(201).json({
             ok: true,
-            producto: productoGuardado
+            orden: ordenGuardado
         });
 
 
@@ -173,33 +177,33 @@ app.post('/', mdAutenticacion.verificaToken, (req, res) => {
 
 
 // ============================================
-//   Borrar un medico por el id
+//   Borrar una orden por el id
 // ============================================
 app.delete('/:id', mdAutenticacion.verificaToken, (req, res) => {
 
     var id = req.params.id;
 
-    Producto.findByIdAndRemove(id, (err, productoBorrado) => {
+    Orden.findByIdAndRemove(id, (err, ordenBorrado) => {
 
         if (err) {
             return res.status(500).json({
                 ok: false,
-                mensaje: 'Error borrar producto',
+                mensaje: 'Error borrar la orden',
                 errors: err
             });
         }
 
-        if (!productoBorrado) {
+        if (!ordenBorrado) {
             return res.status(400).json({
                 ok: false,
-                mensaje: 'No existe un producto con ese id',
-                errors: { message: 'No existe un producto con ese id' }
+                mensaje: 'No existe una orden con ese id',
+                errors: { message: 'No existe una orden con ese id' }
             });
         }
 
         res.status(200).json({
             ok: true,
-            producto: productoBorrado
+            orden: ordenBorrado
         });
 
     });

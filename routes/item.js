@@ -4,36 +4,36 @@ var mdAutenticacion = require('../middlewares/autenticacion');
 
 var app = express();
 
-var Producto = require('../models/producto');
+var Item = require('../models/item');
 
 // ==========================================
-// Obtener todos los producto
+// Obtener todos los items x ordenes
 // ==========================================
 app.get('/', (req, res, next) => {
 
     var desde = req.query.desde || 0;
     desde = Number(desde);
 
-    Producto.find({})
+    Item.find({})
         .skip(desde)
         .limit(20)
-        //.populate('usuario', 'nombre email')
-        .populate('categoria')
+        .populate('producto', 'nombre')
+        .populate('orden', 'num_orden')
         .exec(
-            (err, productos) => {
+            (err, items) => {
 
                 if (err) {
                     return res.status(500).json({
                         ok: false,
-                        mensaje: 'Error cargando producto',
+                        mensaje: 'Error cargando items de ordenes',
                         errors: err
                     });
                 }
 
-                Producto.count({}, (err, conteo) => {
+                Item.count({}, (err, conteo) => {
                     res.status(200).json({
                         ok: true,
-                        productos: productos,
+                        items: items,
                         total: conteo
                     });
 
@@ -42,35 +42,35 @@ app.get('/', (req, res, next) => {
             });
 });
 
-// Obtener 1 producto
+// Obtener 1 orden
 app.get('/:id', (req, res) => {
 
     var id = req.params.id;
 
-    Producto.findById(id) 
-        //.populate('usuario', 'nombre email img')
-        .populate('categoria')
-        .exec ((err, producto)=>{
+    Item.findById(id) 
+        .populate('producto', 'codigo nombre')
+        .populate('orden', 'num_orden')
+        .exec ((err, item)=>{
             if (err) {
                 return res.status(500).json({
                     ok: false,
-                    mensaje: 'Error al buscar producto',
+                    mensaje: 'Error al buscar una orden',
                     errors: err
                 });
             }
 
-            if (!producto) {
+            if (!item) {
                 return res.status(400).json({
                     ok: false,
-                    mensaje: 'El producto con el id ' + id + ' no existe',
-                    errors: { message: 'No existe un producto con ese ID' }
+                    mensaje: 'La orden con el id ' + id + ' no existe',
+                    errors: { message: 'No existe una orden con ese ID' }
                 });
             }
     
             
              res.status(200).json({
              ok: false,
-             producto: producto
+             item: item
                     
              });
           
@@ -78,54 +78,88 @@ app.get('/:id', (req, res) => {
         })
 
 });
+///=========================================
+// Obtener los items de una 1 orden
+// ==========================================
+app.get('/orden/:orden', (req, res, next) => {
+    var orden = req.params.orden;
+    var desde = req.query.desde || 0;
+    desde = Number(desde);
+
+    Item.find({orden : orden })
+        .skip(desde)
+        .limit(20)
+        .populate('producto', 'nombre')
+        .populate('orden', 'num_orden')
+        .exec(
+            (err, items) => {
+
+                if (err) {
+                    return res.status(500).json({
+                        ok: false,
+                        mensaje: 'Error cargando items de  ordenes',
+                        errors: err
+                    });
+                }
+
+                Item.count({}, (err, conteo) => {
+                    res.status(200).json({
+                        ok: true,
+                        items: items,
+                        total: conteo
+                    });
+
+                })
+
+            });
+});
 
 // ==========================================
-// Actualizar Producto
+// Actualizar Orden
 // ==========================================
 app.put('/:id', mdAutenticacion.verificaToken, (req, res) => {
 
     var id = req.params.id;
     var body = req.body;
 
-    Producto.findById(id, (err, producto) => {
+    Item.findById(id, (err, orden) => {
 
 
         if (err) {
             return res.status(500).json({
                 ok: false,
-                mensaje: 'Error al buscar producto',
+                mensaje: 'Error al buscar orden',
                 errors: err
             });
         }
 
-        if (!producto) {
+        if (!item) {
             return res.status(400).json({
                 ok: false,
-                mensaje: 'El producto con el id ' + id + ' no existe',
-                errors: { message: 'No existe un producto con ese ID' }
+                mensaje: 'El item con el id ' + id + ' no existe',
+                errors: { message: 'No existe un item con ese ID' }
             });
         }
 
-        producto.codigo = body.codigo;
-        producto.nombre = body.nombre;
-        //producto.usuario = req.usuario._id;
-        producto.categoria = body.categoria;
-        producto.precio = body.precio;
-        
 
-        producto.save((err, productoGuardado) => {
+        item.cantidad = body.cantidad;
+        item.precio = body.precio;
+        item.producto = body.producto;
+        item.orden = body.orden;
+        
+        item.save((err, itemGuardado) => {
 
             if (err) {
                 return res.status(400).json({
                     ok: false,
-                    mensaje: 'Error al actualizar producto',
+                    mensaje: 'Error al actualizar el item',
                     errors: err
                 });
             }
 
             res.status(200).json({
                 ok: true,
-                producto: productoGuardado
+                item: itemGuardado
             });
 
         });
@@ -137,33 +171,34 @@ app.put('/:id', mdAutenticacion.verificaToken, (req, res) => {
 
 
 // ==========================================
-// Crear un nuevo producto
+// Crear un nuevo item
 // ==========================================
 app.post('/', mdAutenticacion.verificaToken, (req, res) => {
 
     var body = req.body;
 
-    var producto = new Producto({
-        codigo: body.codigo,
-        nombre: body.nombre,
-        //usuario: req.usuario._id,
-        categoria: body.categoria,
-        precio: body.precio
+    var item = new Item({
+
+        orden : body.orden,
+        producto : body.producto,
+        cantidad : body.cantidad,
+        precio : body.precio,
+      
     });
 
-    producto.save((err, productoGuardado) => {
+    item.save((err, itemGuardado) => {
 
         if (err) {
             return res.status(400).json({
                 ok: false,
-                mensaje: 'Error al crear producto',
+                mensaje: 'Error al crear la orden',
                 errors: err
             });
         }
 
         res.status(201).json({
             ok: true,
-            producto: productoGuardado
+            item: itemGuardado
         });
 
 
@@ -179,27 +214,27 @@ app.delete('/:id', mdAutenticacion.verificaToken, (req, res) => {
 
     var id = req.params.id;
 
-    Producto.findByIdAndRemove(id, (err, productoBorrado) => {
+    Item.findByIdAndRemove(id, (err, itemBorrado) => {
 
         if (err) {
             return res.status(500).json({
                 ok: false,
-                mensaje: 'Error borrar producto',
+                mensaje: 'Error borrar item de la orden',
                 errors: err
             });
         }
 
-        if (!productoBorrado) {
+        if (!itemBorrado) {
             return res.status(400).json({
                 ok: false,
-                mensaje: 'No existe un producto con ese id',
-                errors: { message: 'No existe un producto con ese id' }
+                mensaje: 'No existe un item con ese id',
+                errors: { message: 'No existe un item con ese id' }
             });
         }
 
         res.status(200).json({
             ok: true,
-            producto: productoBorrado
+            item: itemBorrado
         });
 
     });

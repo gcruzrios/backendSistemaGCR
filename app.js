@@ -39,10 +39,12 @@ var usuarioRoutes = require('./routes/usuario');
  var loginRoutes = require('./routes/login');
  var productoRoutes = require('./routes/producto');
  var clienteRoutes = require('./routes/cliente');
+ var ordenRoutes = require('./routes/orden');
+ var itemRoutes = require('./routes/item');
  
-// var busquedaRoutes = require('./routes/busqueda');
-// var uploadRoutes = require('./routes/upload');
-// var imagenesRoutes = require('./routes/imagenes');
+ var busquedaRoutes = require('./routes/busqueda');
+ var uploadRoutes = require('./routes/upload');
+ var imagenesRoutes = require('./routes/imagenes');
 
 
 // Rutas
@@ -54,11 +56,12 @@ app.use('/categoria', categoriaRoutes);
 app.use('/login', loginRoutes);
 app.use('/producto', productoRoutes);
 app.use('/cliente', clienteRoutes);
+app.use('/orden', ordenRoutes);
+app.use('/item', itemRoutes);
 
-
-// app.use('/busqueda', busquedaRoutes);
-// app.use('/upload', uploadRoutes);
-// app.use('/img', imagenesRoutes);
+ app.use('/busqueda', busquedaRoutes);
+ app.use('/upload', uploadRoutes);
+ app.use('/img', imagenesRoutes);
 
 
 app.use('/', appRoutes);
