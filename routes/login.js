@@ -92,8 +92,8 @@ app.post('/google', (req, res) => {
                             ok: true,
                             usuario: usuario,
                             token: token,
-                            id: usuario._id,
-                            menu: obtenerMenu(usuario.role)
+                            id: usuario._id
+                            //menu: obtenerMenu(usuario.role)
                         });
 
                     }
@@ -127,8 +127,8 @@ app.post('/google', (req, res) => {
                             ok: true,
                             usuario: usuarioDB,
                             token: token,
-                            id: usuarioDB._id,
-                            menu: obtenerMenu(usuarioDB.role)
+                            id: usuarioDB._id
+                            //menu: obtenerMenu(usuarioDB.role)
                         });
 
                     });
