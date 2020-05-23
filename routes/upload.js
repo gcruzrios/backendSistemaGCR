@@ -138,9 +138,9 @@ function subirPorTipo(tipo, id, nombreArchivo, res) {
 
     if (tipo === 'productos') {
 
-        Medico.findById(id, (err, medico) => {
+        Producto.findById(id, (err, producto) => {
 
-            if (!medico) {
+            if (!producto) {
                 return res.status(400).json({
                     ok: true,
                     mensaje: 'Producto no existe',
