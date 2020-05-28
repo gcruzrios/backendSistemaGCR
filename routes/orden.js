@@ -138,7 +138,7 @@ app.put('/:id', mdAutenticacion.verificaToken, (req, res) => {
 
 
 // ==========================================
-// Crear un nueva orden
+// Crear un nueva orden mdAutenticacion.verificaToken
 // ==========================================
 app.post('/', mdAutenticacion.verificaToken, (req, res) => {
 
@@ -150,9 +150,7 @@ app.post('/', mdAutenticacion.verificaToken, (req, res) => {
         consecutivo : body.consecutivo,
         usuario : req.usuario._id,
         cliente : body.cliente,
-        // nombre: body.nombre,
-        // usuario: req.usuario._id,
-        // hospital: body.hospital
+        
     });
 
     orden.save((err, ordenGuardado) => {

@@ -17,6 +17,7 @@ app.use(bodyParser.json())
 
 // Conexión a la base de datos
 mongoose.connection.openUri('mongodb://localhost:27017/sistemaAdminDB', (err, res) => {
+//mongoose.connection.openUri('mongodb+srv://gcruzrios:Grvn240675@gcr-mongodb-jbim8.mongodb.net/test?retryWrites=true&w=majority', (err, res) => {
 
     if (err) throw err;
 

@@ -42,7 +42,7 @@ app.get('/', (req, res, next) => {
             });
 });
 
-// Obtener 1 orden
+// Obtener 1 item de una orden
 app.get('/:id', (req, res) => {
 
     var id = req.params.id;
@@ -97,7 +97,7 @@ app.get('/orden/:orden', (req, res, next) => {
                 if (err) {
                     return res.status(500).json({
                         ok: false,
-                        mensaje: 'Error cargando items de  ordenes',
+                        mensaje: 'Error cargando items de la orden',
                         errors: err
                     });
                 }
@@ -115,7 +115,7 @@ app.get('/orden/:orden', (req, res, next) => {
 });
 
 // ==========================================
-// Actualizar Orden
+// Actualizar Item
 // ==========================================
 app.put('/:id', mdAutenticacion.verificaToken, (req, res) => {
 
@@ -173,12 +173,13 @@ app.put('/:id', mdAutenticacion.verificaToken, (req, res) => {
 // ==========================================
 // Crear un nuevo item
 // ==========================================
-app.post('/', mdAutenticacion.verificaToken, (req, res) => {
+app.post('/',  (req, res) => {
 
     var body = req.body;
 
     var item = new Item({
 
+        num_linea : body.num_linea,
         orden : body.orden,
         producto : body.producto,
         cantidad : body.cantidad,
@@ -191,7 +192,7 @@ app.post('/', mdAutenticacion.verificaToken, (req, res) => {
         if (err) {
             return res.status(400).json({
                 ok: false,
-                mensaje: 'Error al crear la orden',
+                mensaje: 'Error al crear el item',
                 errors: err
             });
         }

@@ -4,7 +4,7 @@ var Schema = mongoose.Schema;
 
 
 var itemSchema = new Schema({
-    
+    num_linea: { type: String,  required: [true, 'El número  de linea es necesario'] },
     cantidad: { type: Number, required: false },
     orden: { 
         type: Schema.Types.ObjectId,

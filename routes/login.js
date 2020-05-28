@@ -92,8 +92,8 @@ app.post('/google', (req, res) => {
                             ok: true,
                             usuario: usuario,
                             token: token,
-                            id: usuario._id,
-                            menu: obtenerMenu(usuario.role)
+                            id: usuario._id
+                            //menu: obtenerMenu(usuario.role)
                         });
 
                     }
@@ -127,8 +127,8 @@ app.post('/google', (req, res) => {
                             ok: true,
                             usuario: usuarioDB,
                             token: token,
-                            id: usuarioDB._id,
-                            menu: obtenerMenu(usuarioDB.role)
+                            id: usuarioDB._id
+                            //menu: obtenerMenu(usuarioDB.role)
                         });
 
                     });
@@ -154,7 +154,7 @@ app.post('/', (req, res) => {
     var body = req.body;
 
     Usuario.findOne({ email: body.email }, (err, usuarioDB) => {
-
+        
         if (err) {
             return res.status(500).json({
                 ok: false,
@@ -170,6 +170,7 @@ app.post('/', (req, res) => {
                 errors: err
             });
         }
+        
 
         if (!bcrypt.compareSync(body.password, usuarioDB.password)) {
             return res.status(400).json({
@@ -188,7 +189,7 @@ app.post('/', (req, res) => {
             ok: true,
             usuario: usuarioDB,
             token: token,
-            id: usuarioDB._id,
+            id: usuarioDB._id
             //menu: obtenerMenu(usuarioDB.role)
         });
 

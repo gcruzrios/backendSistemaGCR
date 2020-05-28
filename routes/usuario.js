@@ -77,6 +77,7 @@ app.put('/:id', (req, res) => {
 
         usuario.nombre = body.nombre;
         usuario.email = body.email;
+        usuario.password =bcrypt.hashSync(body.password, 10);
         usuario.role = body.role;
 
         usuario.save((err, usuarioGuardado) => {
